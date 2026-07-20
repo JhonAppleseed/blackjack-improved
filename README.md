@@ -13,6 +13,6 @@
 ---------------------------------
   ## How to run - Linux [bash]:
     git clone https://github.com/JhonAppleseed/blackjack-improved
-    ./blackjack-improved
+    ./blackjack
 
 
