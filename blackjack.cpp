@@ -136,6 +136,11 @@ class Game{
       return this->currentPlayer;
     }
 
+    bool finTable(string winner){
+      cout << winner << endl;
+      return false;
+    }
+
     void startGame();
 };
 
@@ -231,9 +236,8 @@ class Table{
           cout << "House total: " << this->houseTotal() << endl;
         }
       }
-
-      bool checkWin(string winner);
-
+      
+      
       int playerTotal(){
         int total = 0;
         for (auto& card : playerCards){
@@ -252,10 +256,6 @@ class Table{
  
 };
 
-bool Game::checkWin(string winner){
-  cout << winner << endl;
-  return false;
-}
 
 
 
@@ -297,10 +297,13 @@ void Game::startGame(){
   // GAME STARTS
 
   Table cutb(playerBet);
-  if (checkWin(cutb.firstSetup(shoe))){continue;}
-  if (checkWin(cutb.playerTurn(shoe))){continue;}
-  if (checkWin(cutb.houseTurn(shoe))){continue;}
-  cout << "All 3 rounds --- loop should start again" << endl;
+  string setupValue = cutb.firstSetup(shoe);
+  if (finTable(setupValue)){continue;}
+  string playerValue = cutb.playerTurn(shoe);
+  if (finTable(playerValue)){continue;}
+  string houseValue = cutb.houseTurn(shoe);
+  if (finTable(houseValue)){continue;}
+  cout << "All 3 rounds --- no winner" << endl;
   }
 } 
 
