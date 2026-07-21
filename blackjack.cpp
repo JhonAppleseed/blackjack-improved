@@ -150,29 +150,12 @@ class Table{
         this->betAmount = x;
       }
 
-      int playerTotal(){
-        int total;
-        for (auto& card : playerCards){
-          total += card.rank;
-        }
-        return total;
-      }
-
-      int houseTotal(){
-        int total;
-        for (auto& card : houseCards){
-          total += card.rank;
-        }
-        return total;
-      }
-
-      string firstSetup(Shoe &shoe){
+      string firstSetup(Shoe& shoe){
         playerCards.push_back(shoe.dealCard());
         playerCards.push_back(shoe.dealCard());
         houseCards.push_back(shoe.dealCard());
         houseCards.push_back(shoe.dealCard());
         cout << "House card: " << this->houseCards[0].rank << endl;
-        cout << "[DB]: " << this->houseTotal() << endl;
         cout << "Player total: " << this->playerTotal() << endl;
         if (this->houseCards[0].rank == 11){
           int pinc;
@@ -194,13 +177,15 @@ class Table{
         return "none";
       }
 
-      string playerTurn(Shoe &shoe){
+      string playerTurn(Shoe& shoe){
+        cout << "Player turn" << endl;
         int playerChoice;
         string avalibility = (this->playerCards[0].rank == this->playerCards[1].rank) ? "" : "not avalibile";
         while (true){
           cout << "(1). Hit" << endl;
           cout << "(2). Stand" << endl;
           cout << "(3). Split " << avalibility << endl;
+          cout << "+>: ";
           cin >> playerChoice;
           if (playerChoice == 1){
             CardStruct dealtCard = shoe.dealCard();
@@ -210,9 +195,11 @@ class Table{
             this->playerCards.push_back(dealtCard);
             cout << "Player total: "<< this->playerTotal() << endl;
             if (this->playerTotal() > 21){
+              cout << "Hitting..." << endl;
               return "house";
             }
           } else if (playerChoice == 2){
+            cout << "Standing..." << endl;
             return "none";
           } else if (playerChoice == 3 && avalibility == ""){
             cout << "Splitting..." << endl;
@@ -220,10 +207,41 @@ class Table{
           }
         }
       }
-      string houseTurn(){
+      string houseTurn(Shoe& shoe){
+        cout << "House turn" << endl;
+        cout << "House total: " << this->houseTotal() << endl;
+        while (true){
+          this->houseCards.push_back(shoe.dealCard());
+          cout << "House total: " << this->houseTotal() << endl;
+          if (this->houseTotal() < 17){
+            continue;
+          }
+          if (this->houseTotal() > 21 || this->houseTotal() < playerTotal()){
+            return "player";
+          } else if (this->houseTotal() == playerTotal()){
+            return "none";
+          }
+        }
+
         return "none";
       }
-      
+
+      int playerTotal(){
+        int total = 0;
+        for (auto& card : playerCards){
+          total += card.rank;
+        }
+        return total;
+      }
+
+      int houseTotal(){
+        int total = 0;
+        for (auto& card : houseCards){
+          total += card.rank;
+        }
+        return total;
+      }
+ 
 
       // Winning logic
 
@@ -265,11 +283,14 @@ void Game::startGame(){
   // GAME STARTS
 
   Table cutb(playerBet);
-  string setupValue = cutb.firstSetup(shoe);
-  if (setupValue == "none"){
-    cutb.playerTurn(shoe);
+  string winner = cutb.firstSetup(shoe);
+  if (winner == "none"){
+    string winner = cutb.playerTurn(shoe);
+    if (winner == "none"){
+      string winner = cutb.houseTurn(shoe);
+    }
   }
-  
+  cout << winner << " has won" << endl;
 }
 
 struct InitPlayer{
