@@ -211,19 +211,25 @@ class Table{
         cout << "House turn" << endl;
         cout << "House total: " << this->houseTotal() << endl;
         while (true){
-          this->houseCards.push_back(shoe.dealCard());
+          if (this->houseTotal() > 17){
+            if ((this->houseTotal() > 21) || (this->houseTotal() < this->playerTotal())){
+              cout << "Player has won" << endl;
+              return "player";
+            } else if (this->houseTotal() == this->playerTotal()){
+              cout << "Push" << endl;
+              return "none"; 
+            } else {
+              cout << "House wins by amount" << endl;
+              return "house";
+            }
+          }
+          CardStruct dealtCard = shoe.dealCard();
+          if (dealtCard.rank == 11 && houseTotal() >= 11){
+            dealtCard.rank = 1;
+          }
+          this->houseCards.push_back(dealtCard);
           cout << "House total: " << this->houseTotal() << endl;
-          if (this->houseTotal() < 17){
-            continue;
-          }
-          if (this->houseTotal() > 21 || this->houseTotal() < playerTotal()){
-            return "player";
-          } else if (this->houseTotal() == playerTotal()){
-            return "none";
-          }
         }
-
-        return "none";
       }
 
       int playerTotal(){
@@ -242,9 +248,6 @@ class Table{
         return total;
       }
  
-
-      // Winning logic
-
 };
 
 void Game::startGame(){
@@ -284,10 +287,13 @@ void Game::startGame(){
 
   Table cutb(playerBet);
   string winner = cutb.firstSetup(shoe);
+  cout << "After first setup " << winner << endl;
   if (winner == "none"){
     string winner = cutb.playerTurn(shoe);
+    cout << "After player turn" << winner << endl;
     if (winner == "none"){
       string winner = cutb.houseTurn(shoe);
+      cout << "After house turn" << winner << endl;
     }
   }
   cout << winner << " has won" << endl;
