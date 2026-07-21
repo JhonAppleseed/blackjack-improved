@@ -232,6 +232,8 @@ class Table{
         }
       }
 
+      bool checkWin(string winner);
+
       int playerTotal(){
         int total = 0;
         for (auto& card : playerCards){
@@ -250,6 +252,13 @@ class Table{
  
 };
 
+bool Game::checkWin(string winner){
+  cout << winner << endl;
+  return false;
+}
+
+
+
 void Game::startGame(){
   int playerChoice;
   do{
@@ -261,7 +270,9 @@ void Game::startGame(){
   Shoe shoe(playerChoice); // shoe init when game starts
 
   // WHILE LOOP SHOULD BE HERE
+  while (true){
 
+  
   int playerOption;
   while (true){
     cout << "\n(1) Choose bet" << endl;
@@ -286,18 +297,12 @@ void Game::startGame(){
   // GAME STARTS
 
   Table cutb(playerBet);
-  string winner = cutb.firstSetup(shoe);
-  cout << "After first setup " << winner << endl;
-  if (winner == "none"){
-    string winner = cutb.playerTurn(shoe);
-    cout << "After player turn" << winner << endl;
-    if (winner == "none"){
-      string winner = cutb.houseTurn(shoe);
-      cout << "After house turn" << winner << endl;
-    }
+  if (checkWin(cutb.firstSetup(shoe))){continue;}
+  if (checkWin(cutb.playerTurn(shoe))){continue;}
+  if (checkWin(cutb.houseTurn(shoe))){continue;}
+  cout << "All 3 rounds --- loop should start again" << endl;
   }
-  cout << winner << " has won" << endl;
-}
+} 
 
 struct InitPlayer{
   string name;
