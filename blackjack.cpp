@@ -111,6 +111,10 @@ class Player{
       return this->bal;
     }
 
+    void incWin(){
+      this->wins += 1;
+    }
+
     void presentPlayer(){
       cout << endl;
       cout << "Player: " << this->name << endl;
@@ -141,8 +145,6 @@ class Game{
     }
 
     bool finTable(string winner, int tableBal){
-      cout << winner << endl;
-      // 4 possibility (none, player, house, push)
       if (winner == "none"){
         return false;
       } else if (winner == "push"){
@@ -151,6 +153,7 @@ class Game{
       } else if (winner == "player"){
         cout << "Player has won" << endl;
         getCurrentPlayer().crementBal(tableBal);
+        getCurrentPlayer().incWin();
         return true;
       } else if (winner == "house"){
         cout << "House has won" << endl;
@@ -166,7 +169,7 @@ class Game{
 class Table{
   private:
     int betAmount;
-    int incurance = 0;
+    int incurance;
     vector<CardStruct> playerCards;
     vector<CardStruct> houseCards;
   public:
@@ -178,6 +181,10 @@ class Table{
         return betAmount;
       }
 
+      int getTableIncurance(){
+        return incurance;
+      }
+
       string firstSetup(Shoe& shoe){
         playerCards.push_back(shoe.dealCard());
         playerCards.push_back(shoe.dealCard());
@@ -187,15 +194,26 @@ class Table{
         cout << "Player total: " << this->playerTotal() << endl;
         if (this->houseCards[0].rank == 11){
           int pinc;
-          do {
+          while (true){
             cout << "Incurance?" << endl;
             cout << "1. yes | 2. no" << endl;
             cout << "+>: ";
             cin >> pinc;
-          } while(pinc < 1 || pinc > 2);
-          if (pinc == 1){
-            this->incurance = betAmount / 2;
+            if (pinc == 1){
+              if (this->houseTotal() == 21){
+                this->incurance = betAmount / 2;
+                return "house";
+              } else {
+                this->incurance = -(betAmount / 2);
+              }
+              break;
+            } else if (pinc == 2){
+              break;
+            } else {
+              continue;
+            }
           }
+            
         }
         if (this->playerTotal() == 21 && this->playerTotal() > this->houseTotal()){
           return "player";
@@ -216,6 +234,7 @@ class Table{
           cout << "+>: ";
           cin >> playerChoice;
           if (playerChoice == 1){
+            cout << "Hitting..." << endl;
             CardStruct dealtCard = shoe.dealCard();
             if (dealtCard.rank == 11 && playerTotal() >= 11){
               dealtCard.rank = 1;
@@ -223,7 +242,7 @@ class Table{
             this->playerCards.push_back(dealtCard);
             cout << "Player total: "<< this->playerTotal() << endl;
             if (this->playerTotal() > 21){
-              cout << "Hitting..." << endl;
+              cout << "Over the bar..." << endl;
               return "house";
             }
           } else if (playerChoice == 2){
@@ -241,13 +260,10 @@ class Table{
         while (true){
           if (this->houseTotal() > 17){
             if ((this->houseTotal() > 21) || (this->houseTotal() < this->playerTotal())){
-              cout << "Player has won" << endl;
               return "player";
             } else if (this->houseTotal() == this->playerTotal()){
-              cout << "Push" << endl;
               return "push"; 
             } else {
-              cout << "House wins by amount" << endl;
               return "house";
             }
           }
@@ -296,11 +312,12 @@ void Game::startGame(){
   while (true){
     int playerOption;
     while (true){
-      cout << "\n(1) Choose bet" << endl;
+      cout << "\n" << "Current Balance: " << currentPlayer.getBalance() << endl;
+      cout << "(1) Choose bet" << endl;
       cout << "(2) Leave table" << endl;
       cout << "+>: ";
       cin >> playerOption;
-      if (playerOption == 1){
+      if (playerOption == 1 && currentPlayer.getBalance() > 0){
         break;
       } else if (playerOption == 2) {
         return;
@@ -319,7 +336,10 @@ void Game::startGame(){
 
     Table cutb(playerBet);
     string setupValue = cutb.firstSetup(shoe);
-    if (finTable(setupValue, cutb.getTableBet())){continue;}
+    if (finTable(setupValue, cutb.getTableBet())){ 
+      currentPlayer.crementBal(cutb.getTableIncurance());
+      continue;
+    }
     string playerValue = cutb.playerTurn(shoe);
     if (finTable(playerValue, cutb.getTableBet())){continue;}
     string houseValue = cutb.houseTurn(shoe);
