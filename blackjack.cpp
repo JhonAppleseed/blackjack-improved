@@ -103,6 +103,10 @@ class Player{
       this->bal += topUp;
     }
 
+    void crementBal(int x){
+      this-> bal += x;
+    }
+
     int getBalance(){
       return this->bal;
     }
@@ -136,8 +140,23 @@ class Game{
       return this->currentPlayer;
     }
 
-    bool finTable(string winner){
+    bool finTable(string winner, int tableBal){
       cout << winner << endl;
+      // 4 possibility (none, player, house, push)
+      if (winner == "none"){
+        return false;
+      } else if (winner == "push"){
+        cout << "Push" << endl;
+        return true;
+      } else if (winner == "player"){
+        cout << "Player has won" << endl;
+        getCurrentPlayer().crementBal(tableBal);
+        return true;
+      } else if (winner == "house"){
+        cout << "House has won" << endl;
+        getCurrentPlayer().crementBal(-tableBal);
+        return true;
+      }
       return false;
     }
 
@@ -153,6 +172,10 @@ class Table{
   public:
       Table(int x){
         this->betAmount = x;
+      }
+
+      int getTableBet(){
+        return betAmount;
       }
 
       string firstSetup(Shoe& shoe){
@@ -222,7 +245,7 @@ class Table{
               return "player";
             } else if (this->houseTotal() == this->playerTotal()){
               cout << "Push" << endl;
-              return "none"; 
+              return "push"; 
             } else {
               cout << "House wins by amount" << endl;
               return "house";
@@ -271,39 +294,36 @@ void Game::startGame(){
 
   // WHILE LOOP SHOULD BE HERE
   while (true){
-
-  
-  int playerOption;
-  while (true){
-    cout << "\n(1) Choose bet" << endl;
-    cout << "(2) Leave table" << endl;
-    cout << "+>: ";
-    cin >> playerOption;
-    if (playerOption == 1){
-      break;
-    } else if (playerOption == 2) {
-      return;
-    } else {
-      continue;
+    int playerOption;
+    while (true){
+      cout << "\n(1) Choose bet" << endl;
+      cout << "(2) Leave table" << endl;
+      cout << "+>: ";
+      cin >> playerOption;
+      if (playerOption == 1){
+        break;
+      } else if (playerOption == 2) {
+        return;
+      } else {
+        continue;
+      }
     }
-  }
 
-  int playerBet;
-  do{
-    cout << "\nBet amount (1-100)" << endl;
-    cout << "+>: ";
-    cin >> playerBet;
-  } while (playerBet < 1 || playerBet > 100 || playerBet > currentPlayer.getBalance());
-  // GAME STARTS
+    int playerBet;
+    do{
+      cout << "\nBet amount (1-100)" << endl;
+      cout << "+>: ";
+      cin >> playerBet;
+    } while (playerBet < 1 || playerBet > 100 || playerBet > currentPlayer.getBalance());
+    // GAME STARTS
 
-  Table cutb(playerBet);
-  string setupValue = cutb.firstSetup(shoe);
-  if (finTable(setupValue)){continue;}
-  string playerValue = cutb.playerTurn(shoe);
-  if (finTable(playerValue)){continue;}
-  string houseValue = cutb.houseTurn(shoe);
-  if (finTable(houseValue)){continue;}
-  cout << "All 3 rounds --- no winner" << endl;
+    Table cutb(playerBet);
+    string setupValue = cutb.firstSetup(shoe);
+    if (finTable(setupValue, cutb.getTableBet())){continue;}
+    string playerValue = cutb.playerTurn(shoe);
+    if (finTable(playerValue, cutb.getTableBet())){continue;}
+    string houseValue = cutb.houseTurn(shoe);
+    if (finTable(houseValue, cutb.getTableBet())){continue;}
   }
 } 
 
