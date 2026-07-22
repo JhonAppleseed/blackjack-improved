@@ -3,12 +3,14 @@
   Improvements regarding the code are more than welcome!
 
 ## Current Features
-  - Deck initializing
+  - Main menu
   - Possibility for many decks in a shoe
+  - Full game logic (excluding splitting & doubling)
 ## Upcomming Features
-  - Full game logic (splitting)
-  - Betting (fake money)
   - Statistics
+  - Splitting
+## Bugs
+  - Might trigger bad response with aces
 
 ---------------------------------
   ## How to run - Linux [bash]:
