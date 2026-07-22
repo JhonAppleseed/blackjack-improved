@@ -55,9 +55,8 @@ class Shoe{
     }
 
     CardStruct dealCard(){
-      int randInt = rand() % cardsInShoe();
-      CardStruct chosenCard = shoeOfCards.at(randInt);
-      shoeOfCards.erase(shoeOfCards.begin() + randInt);
+      CardStruct chosenCard = shoeOfCards.back();
+      shoeOfCards.pop_back();
       return chosenCard;
     }
 
@@ -307,6 +306,7 @@ void Game::startGame(){
   } while(playerChoice < 1 || playerChoice > 8);
 
   Shoe shoe(playerChoice); // shoe init when game starts
+  shoe.shuffleRack();
 
   // WHILE LOOP SHOULD BE HERE
   while (true){
